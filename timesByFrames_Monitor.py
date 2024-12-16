@@ -4,25 +4,22 @@ import time
 import pylab
 from psychopy.visual import ShapeStim
 
-
 visual.useFBO = True
 
-port = serial.Serial('COM4',115200)
+port = serial.Serial('COM4',115200) # Mit dem Arduino verbinden
 time.sleep(1)
 pmes = [] #Werte vom Arduino
 
 wait = 0
 while wait == 0:
-    wait = int(port.readline().decode().strip())
+    wait = int(port.readline().decode().strip()) # Wartet auf den Arduino
 
-nIntervals = 500
-win = visual.Window([1920, 1080], fullscr=True, allowGUI=False, waitBlanking=True)
+nIntervals = 500 # nIntervals/50 Bilder werden angezeigt
+win = visual.Window([1920, 1080], fullscr=False, allowGUI=False, waitBlanking=True)
 Vert = [[(-.9,-.9),(-.9,.9),(.9,.9),(.9,-.9)]]
-myStim1 = ShapeStim(win, vertices=Vert, fillColor='black', lineWidth=0, size=1)
-myStim2 = ShapeStim(win, vertices=Vert, fillColor='white', lineWidth=0, size=1)
+myStim1 = ShapeStim(win, vertices=Vert, fillColor='black', lineWidth=0, size=1) # schwarzes Rechteck
+myStim2 = ShapeStim(win, vertices=Vert, fillColor='white', lineWidth=0, size=1) # weißes Rechteck
 
-
-    
 win.recordFrameIntervals = True
 for frameN in range(nIntervals):
     if (frameN//50) % 2 != 0:
@@ -34,11 +31,11 @@ for frameN in range(nIntervals):
     win.logOnFlip(msg='frame=%i' %frameN, level=logging.EXP)
     win.flip()
     while port.inWaiting() > 0:
-        pmes.append(float(int(port.readline().decode().strip())/1000))
+        pmes.append(float(int(port.readline().decode().strip())/1000)) # auslesen der vom Arduino gemessenen Zeit
 port.close()
-win.fullscr = False
 win.close()
 
+# Berechnen der Zeitdifferenz zwischen Grafikkarte und Monitor
 intervals = pylab.array(win.frameIntervals) * 1000
 intervalsMS = []
 for i in range(len(pmes)):
