@@ -3,69 +3,115 @@ import serial
 import time
 import pylab
 from psychopy.visual import ShapeStim
-
 visual.useFBO = True
 
 port = serial.Serial('COM4',115200) # Mit dem Arduino verbinden
+print("Mit dem Arduino verbunden.")
 time.sleep(1)
 pmes = [] #Werte vom Arduino
+pmes1 = [] #Differenz von Grafikkarte und Monitor
+intervalsMS = []
+
+nIntervals = 500 # nIntervals/50 Bilder werden angezeigt
+
+print("Start der Kalibrierung.")
+win = visual.Window([1920, 1080], fullscr=True, allowGUI=False, waitBlanking=True)
+Vert = [[(-0.5,-0.5),(-0.5,0.5),(0.5,0.5),(0.5,-0.5)]] #Größe des Rechtecks, +/- 1 ist der höchste Wert
+myStim1 = ShapeStim(win, vertices=Vert, fillColor='black', lineWidth=0, size=1)
+for frameN in range(300):
+    myStim1.draw()
+    if event.getKeys():
+        break
+    win.flip() #Wartet auf die Grafikkarte für das nächste Bild
+win.close()
+print("Kalibrierung abgeschlossen.")
 
 wait = 0
 while wait == 0:
-    wait = int(port.readline().decode().strip()) # Wartet auf den Arduino
+    wait = int(port.readline().decode().strip()) #Arduino ist für den Test bereit.
 
-nIntervals = 500 # nIntervals/50 Bilder werden angezeigt
-win = visual.Window([1920, 1080], fullscr=False, allowGUI=False, waitBlanking=True)
+print("Start des Tests.")
+
+win2 = visual.Window([1920, 1080], fullscr=True, allowGUI=False, waitBlanking=True)
 Vert = [[(-.9,-.9),(-.9,.9),(.9,.9),(.9,-.9)]]
-myStim1 = ShapeStim(win, vertices=Vert, fillColor='black', lineWidth=0, size=1) # schwarzes Rechteck
-myStim2 = ShapeStim(win, vertices=Vert, fillColor='white', lineWidth=0, size=1) # weißes Rechteck
+myStim2 = ShapeStim(win2, vertices=Vert, fillColor='black', lineWidth=0, size=1)
+myStim3 = ShapeStim(win2, vertices=Vert, fillColor='white', lineWidth=0, size=1)
 
-win.recordFrameIntervals = True
+win2.recordFrameIntervals = True #Zeichnet die Zeiten der Bildwechsel abhängig von de Grafikkarte auf (win.flip())
+oldbild=2 
 for frameN in range(nIntervals):
-    if (frameN//50) % 2 != 0:
-        myStim1.draw()
-    else:
+    if (frameN//10) % 2 != 0:
         myStim2.draw()
+        bild=1
+    else:
+        myStim3.draw()
+        bild=2
     if event.getKeys():
         break
-    win.logOnFlip(msg='frame=%i' %frameN, level=logging.EXP)
-    win.flip()
+    win2.logOnFlip(msg='frame=%i' %frameN, level=logging.EXP)
+    if bild != oldbild:
+        t1=time.perf_counter_ns()
+    win2.flip()
+    hatread=0 
+    if bild != oldbild:
+        t2=time.perf_counter_ns()
+        x=0
+        while (port.inWaiting() == 0 and (time.perf_counter()-t2)<0.03):
+            x = x + 1
+        t3=time.perf_counter_ns()
     while port.inWaiting() > 0:
-        pmes.append(float(int(port.readline().decode().strip())/1000)) # auslesen der vom Arduino gemessenen Zeit
+        pmes.append(float(int(port.readline().decode().strip()))) # auslesen der vom Arduino gemessenen Zeit in ms
+        hatread=1
+    if bild != oldbild:
+        intervalsMS.append((t2-t1)/1000000)
+        pmes1.append((t3-t2)/1000000)
+        print((t3-t2)/1000000) #Zeitdifferenz zwischen Grafikkarte und Monitor
+        print((t2-t1)/1000000) #Zeitdifferenz zwischen Bild wird an Grafikkarte übergeben und Grafikkarte hat das Bild an den Monitor weitergegeben 
+        print(hatread) #wenn 0, dann wurde das Bild nicht erkannt
+    oldbild = bild
 port.close()
-win.close()
+win2.close()
 
 # Berechnen der Zeitdifferenz zwischen Grafikkarte und Monitor
-intervals = pylab.array(win.frameIntervals) * 1000
-intervalsMS = []
+intervals = pylab.array(win2.frameIntervals) * 1000
+intervalsM = []
 for i in range(len(pmes)):
-    if i == 0:
-        intervalsMS.append(pmes[i])
-    else:
-        intervalsMS.append(pmes[i] - intervals[i])
-m = pylab.mean(intervalsMS)
-sd = pylab.std(intervalsMS)
+    if i > 0:
+        intervalsM.append(pmes[i]) #Zeitdiffernez zwischen Bildwechsel (flip()) und ERfassung durch Diode
+        
+m = pylab.mean(pmes1)
 
-msg = "Mean=%.1fms, s.d.=%.2f, 99%%CI(frame)=%.2f-%.2f"
-distString = msg % (m, sd, m - 2.58 * sd, m + 2.58 * sd)
-nTotal = len(intervalsMS)
-nDropped = sum(intervalsMS > (1.5 * m))
-msg = "Frames = %i"
-droppedString = msg % (nTotal)
+pylab.figure(figsize=[15, 10])
+pylab.subplot(3, 2, 1)
+pylab.plot(pmes1, '-')
+pylab.ylabel('t (ms)')
+pylab.xlabel('frame N')
+pylab.title("t3-t2")
 
-pylab.figure(figsize=[12, 8])
-pylab.subplot(1, 2, 1)
+pylab.subplot(3, 2, 2)
+pylab.hist(pmes1, 50, histtype='stepfilled')
+pylab.xlabel('t (ms)')
+pylab.ylabel('n frames')
+
+
+m_ard = pylab.mean(intervalsM)
+sd_ard = pylab.std(intervalsM)
+
+
+#for i in range(len(intervalsM)):
+#    if intervalsM[i] <= m_ard + sd_ard and intervalsM[i] >= m_ard - sd_ard:
+#        intervalsMS.append(intervalsM[i])
+
+pylab.subplot(3, 2, 5)
 pylab.plot(intervalsMS, '-')
 pylab.ylabel('t (ms)')
 pylab.xlabel('frame N')
-pylab.title(droppedString)
+pylab.title("t2-t1")
 
-pylab.subplot(1, 2, 2)
+pylab.subplot(3, 2, 6)
 pylab.hist(intervalsMS, 50, histtype='stepfilled')
 pylab.xlabel('t (ms)')
 pylab.ylabel('n frames')
-pylab.title(distString)
 pylab.show()
 
-win.close()
 core.quit()

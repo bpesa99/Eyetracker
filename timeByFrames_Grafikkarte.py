@@ -7,14 +7,14 @@ import sys
 from psychopy.visual import ShapeStim
 
 nIntervals = 500 # nIntervals/50 Bilder werden angezeigt
-win = visual.Window([1920, 1080], fullscr=False, allowGUI=False, waitBlanking=True)
+win = visual.Window([1920, 1080], fullscr=True, allowGUI=False, waitBlanking=True)
     
 Vert = [[(-.9,-.9),(-.9,.9),(.9,.9),(.9,-.9)]]
 myStim1 = ShapeStim(win, vertices=Vert, fillColor='black', lineWidth=0, size=1) # schwarzes Rechteck
 myStim2 = ShapeStim(win, vertices=Vert, fillColor='white', lineWidth=0, size=1) # weißes Rechteck
 
 win.recordFrameIntervals = True
-for frameN in range(nIntervals + 1):
+for frameN in range(nIntervals):
     if (frameN//50) % 2 != 0:
         myStim1.draw()
     else:
@@ -51,6 +51,5 @@ pylab.ylabel('n frames')
 pylab.title(distString)
 pylab.show()
 
-pylab.savetxt("FlipTimes.txt",intervalsMS/10)
 win.close()
 core.quit()
