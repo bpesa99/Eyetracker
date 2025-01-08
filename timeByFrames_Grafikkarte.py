@@ -29,11 +29,11 @@ m = pylab.mean(intervalsMS) # Mittelwert
 sd = pylab.std(intervalsMS) # Standardabweichung
 
 msg = "Mean=%.1fms, s.d.=%.2f"
-distString = msg % (m, sd, m - 2.58 * sd, m + 2.58 * sd)
+distString = msg % (m, sd)
 nTotal = len(intervalsMS)
 nDropped = sum(intervalsMS > (1.5 * m))
-msg = "Dropped/Frames = %i/%i = %.3f%%"
-droppedString = msg % (nDropped, nTotal, 100 * nDropped / float(nTotal))
+msg = "Dropped/Frames = %i/%i"
+droppedString = msg % (nDropped, nTotal)
 
 # Zeitintervale werden geplottet
 pylab.figure(figsize=[12, 8])

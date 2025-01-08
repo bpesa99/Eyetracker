@@ -11,7 +11,7 @@ time.sleep(1)
 pmes1 = [] #Differenz von Grafikkarte und Monitor
 intervalsMS = []
 
-nIntervals = 500 # nIntervals/50 Bilder werden angezeigt
+nIntervals = 500
 
 print("Start der Kalibrierung.")
 win = visual.Window([1920, 1080], fullscr=True, allowGUI=False, waitBlanking=True)
@@ -59,9 +59,10 @@ for frameN in range(nIntervals):
             x = x + 1
         t3=time.perf_counter_ns()
     while port.inWaiting() > 0:
+        port.read()
         hatread=1
     if bild != oldbild:
-        intervalsMS.append((t2-t1)/1000000) #Zeitdifferenz Programm und Grafikkarte
+        intervalsMS.append((t2-t1)/1000000) #Zeitdauer der Grafikkarte zum Prozessieren des Bildes
         pmes1.append((t3-t2)/1000000) #Zeitdifferenz zwischen Grafikkarte und Monitor
         print((t3-t2)/1000000) 
         print((t2-t1)/1000000) 
@@ -82,17 +83,19 @@ pylab.subplot(3, 2, 2)
 pylab.hist(pmes1, 50, histtype='stepfilled')
 pylab.xlabel('t (ms)')
 pylab.ylabel('n frames')
+pylab.title("Histogramm der Zeitdifferenz von Grafikkarte zu Monitor")
 
 pylab.subplot(3, 2, 5)
 pylab.plot(intervalsMS, '-')
 pylab.ylabel('t (ms)')
 pylab.xlabel('frame N')
-pylab.title("Zeitdifferenz von Programm zu Grafikkarte")
+pylab.title("Zeitdauer der Grafikkarte zum Prozessieren des Bildes")
 
 pylab.subplot(3, 2, 6)
 pylab.hist(intervalsMS, 50, histtype='stepfilled')
 pylab.xlabel('t (ms)')
 pylab.ylabel('n frames')
+pylab.title("Histogramm der Zeitdauer der Grafikkarte zum Prozessieren des Bildes")
 pylab.show()
 
 core.quit()
