@@ -13,7 +13,7 @@ double spannungmessen(){
   double sensorValue = 0;
   const int n = 10;
   for ( int i = 0; i < n; i++){
-    sensorValue += analogRead(A0);
+    sensorValue += analogRead(A0); //Spannungswert wird gemittelt, da er sonst false positives hat
   }
   return (sensorValue/n) * (5000.0/1023.0);
 }
