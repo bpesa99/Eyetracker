@@ -1,10 +1,9 @@
 from psychopy import visual, logging, core, event
-visual.useFBO = True
-
 import matplotlib
 import pylab
 import sys
 from psychopy.visual import ShapeStim
+visual.useFBO = True
 
 nIntervals = 500 # nIntervals/50 Bilder werden angezeigt
 win = visual.Window([1920, 1080], fullscr=True, allowGUI=False, waitBlanking=True)
@@ -29,7 +28,7 @@ intervalsMS = pylab.array(win.frameIntervals) * 1000 # Zeiten der Bildwechsel in
 m = pylab.mean(intervalsMS) # Mittelwert
 sd = pylab.std(intervalsMS) # Standardabweichung
 
-msg = "Mean=%.1fms, s.d.=%.2f, 99%%CI(frame)=%.2f-%.2f"
+msg = "Mean=%.1fms, s.d.=%.2f"
 distString = msg % (m, sd, m - 2.58 * sd, m + 2.58 * sd)
 nTotal = len(intervalsMS)
 nDropped = sum(intervalsMS > (1.5 * m))

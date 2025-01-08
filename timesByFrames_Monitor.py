@@ -8,7 +8,6 @@ visual.useFBO = True
 port = serial.Serial('COM4',115200) # Mit dem Arduino verbinden
 print("Mit dem Arduino verbunden.")
 time.sleep(1)
-pmes = [] #Werte vom Arduino
 pmes1 = [] #Differenz von Grafikkarte und Monitor
 intervalsMS = []
 
@@ -60,53 +59,35 @@ for frameN in range(nIntervals):
             x = x + 1
         t3=time.perf_counter_ns()
     while port.inWaiting() > 0:
-        pmes.append(float(int(port.readline().decode().strip()))) # auslesen der vom Arduino gemessenen Zeit in ms
         hatread=1
     if bild != oldbild:
-        intervalsMS.append((t2-t1)/1000000)
-        pmes1.append((t3-t2)/1000000)
-        print((t3-t2)/1000000) #Zeitdifferenz zwischen Grafikkarte und Monitor
-        print((t2-t1)/1000000) #Zeitdifferenz zwischen Bild wird an Grafikkarte übergeben und Grafikkarte hat das Bild an den Monitor weitergegeben 
+        intervalsMS.append((t2-t1)/1000000) #Zeitdifferenz Programm und Grafikkarte
+        pmes1.append((t3-t2)/1000000) #Zeitdifferenz zwischen Grafikkarte und Monitor
+        print((t3-t2)/1000000) 
+        print((t2-t1)/1000000) 
         print(hatread) #wenn 0, dann wurde das Bild nicht erkannt
     oldbild = bild
 port.close()
 win2.close()
 
-# Berechnen der Zeitdifferenz zwischen Grafikkarte und Monitor
-intervals = pylab.array(win2.frameIntervals) * 1000
-intervalsM = []
-for i in range(len(pmes)):
-    if i > 0:
-        intervalsM.append(pmes[i]) #Zeitdiffernez zwischen Bildwechsel (flip()) und ERfassung durch Diode
-        
 m = pylab.mean(pmes1)
-
 pylab.figure(figsize=[15, 10])
 pylab.subplot(3, 2, 1)
 pylab.plot(pmes1, '-')
 pylab.ylabel('t (ms)')
 pylab.xlabel('frame N')
-pylab.title("t3-t2")
+pylab.title("Zeitdifferenz von Grafikkarte zu Monitor")
 
 pylab.subplot(3, 2, 2)
 pylab.hist(pmes1, 50, histtype='stepfilled')
 pylab.xlabel('t (ms)')
 pylab.ylabel('n frames')
 
-
-m_ard = pylab.mean(intervalsM)
-sd_ard = pylab.std(intervalsM)
-
-
-#for i in range(len(intervalsM)):
-#    if intervalsM[i] <= m_ard + sd_ard and intervalsM[i] >= m_ard - sd_ard:
-#        intervalsMS.append(intervalsM[i])
-
 pylab.subplot(3, 2, 5)
 pylab.plot(intervalsMS, '-')
 pylab.ylabel('t (ms)')
 pylab.xlabel('frame N')
-pylab.title("t2-t1")
+pylab.title("Zeitdifferenz von Programm zu Grafikkarte")
 
 pylab.subplot(3, 2, 6)
 pylab.hist(intervalsMS, 50, histtype='stepfilled')
