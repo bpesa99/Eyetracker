@@ -71,19 +71,28 @@ for frameN in range(nIntervals):
 port.close()
 win2.close()
 
-m = pylab.mean(pmes1)
 pylab.figure(figsize=[15, 10])
+m = pylab.mean(pmes1)
+abw = pylab.std(pmes1)
+
+
 pylab.subplot(3, 2, 1)
 pylab.plot(pmes1, '-')
 pylab.ylabel('t (ms)')
 pylab.xlabel('frame N')
 pylab.title("Zeitdifferenz von Grafikkarte zu Monitor")
-
+if abw < 2.4:
+    pylab.text(58,-20,"Die Messergbnisse sind valide!",fontsize=20,color='green', ha='center', va='center')
+elif abw >= 2.4:
+    pylab.text(58,-20,"Die Messergbnisse sind nicht valide!",fontsize=23,color='red', ha='center', va='center')
+    pylab.text(58,-25,"Kontrolle des Histogramms der Zeitdifferenz von Grafikkarte zu Monitor notwendig!",fontsize=23,color='red', ha='center', va='center')
+print(abw)
 pylab.subplot(3, 2, 2)
 pylab.hist(pmes1, 50, histtype='stepfilled')
 pylab.xlabel('t (ms)')
 pylab.ylabel('n frames')
 pylab.title("Histogramm der Zeitdifferenz von Grafikkarte zu Monitor")
+
 
 pylab.subplot(3, 2, 5)
 pylab.plot(intervalsMS, '-')
@@ -97,5 +106,7 @@ pylab.xlabel('t (ms)')
 pylab.ylabel('n frames')
 pylab.title("Histogramm der Zeitdauer der Grafikkarte zum Prozessieren des Bildes")
 pylab.show()
+    
+
 
 core.quit()
