@@ -1,9 +1,8 @@
-from psychopy import visual, logging, core, event
+from psychopy import visual, core, event
 import serial
 import time
 import pylab
 from psychopy.visual import ShapeStim
-visual.useFBO = True
 
 port = serial.Serial('COM4',115200) # Mit dem Arduino verbinden
 print("Mit dem Arduino verbunden.")
@@ -14,10 +13,10 @@ pmes2 = [] #Differenz von Programm zu Grafikkarte
 nIntervals = 500
 
 print("Start der Kalibrierung.")
-win = visual.Window([1920, 1080], fullscr=True, allowGUI=False, waitBlanking=True)
-Vert = [[(-0.5,-0.5),(-0.5,0.5),(0.5,0.5),(0.5,-0.5)]] #Größe des Rechtecks, +/- 1 ist der höchste Wert
-myStim1 = ShapeStim(win, vertices=Vert, fillColor='black', lineWidth=0, size=1)
-myStim2 = ShapeStim(win, vertices=Vert, fillColor='white', lineWidth=0, size=1)
+win = visual.Window(fullscr=True, waitBlanking=True, screen=1)
+Vert = [[(-0.2,-0.2),(-0.2,0.2),(0.2,0.2),(0.2,-0.2)]] #Größe des Rechtecks, +/- 1 ist der höchste Wert
+myStim1 = ShapeStim(win, vertices=Vert, fillColor='black')
+myStim2 = ShapeStim(win, vertices=Vert, fillColor='white')
 
 for frameN in range(300):
     myStim1.draw()
@@ -33,8 +32,7 @@ while wait == 0:
 
 print("Start des Tests.")
 
-win.recordFrameIntervals = True #Zeichnet die Zeiten der Bildwechsel abhängig von de Grafikkarte auf (win.flip())
-oldbild=2 
+oldbild=1
 for frameN in range(nIntervals):
     if (frameN//10) % 2 != 0:
         myStim1.draw()
@@ -44,7 +42,6 @@ for frameN in range(nIntervals):
         bild=2
     if event.getKeys():
         break
-    win.logOnFlip(msg='frame=%i' %frameN, level=logging.EXP)
     if bild != oldbild:
         t1=time.perf_counter_ns() #Start des Bildwechsels vom Programm
     win.flip()
@@ -56,7 +53,7 @@ for frameN in range(nIntervals):
             x = x + 1
         t3=time.perf_counter_ns() #Der Bildwechsel wurde vom Arduino detektiert
     while port.inWaiting() > 0:
-        port.read()
+        port.read() #Filler, damit die Schleife funktioniert
         hatread=1
     if bild != oldbild:
         pmes1.append((t3-t2)/1000000)
@@ -78,9 +75,9 @@ pylab.title("Zeitdifferenz von Grafikkarte zu Monitor")
 print(abw)
 
 pylab.subplot(3, 2, 2)
-pylab.hist(pmes1, 50, histtype='stepfilled')
+pylab.hist(pmes1, 5, histtype='bar')
 pylab.xlabel('t (ms)')
-pylab.ylabel('n frames')
+pylab.ylabel('N frames')
 pylab.title("Histogramm der Zeitdifferenz von Grafikkarte zu Monitor")
 
 pylab.subplot(3, 2, 5)
@@ -90,9 +87,9 @@ pylab.xlabel('frame N')
 pylab.title("Zeitdauer der Grafikkarte zum Prozessieren des Bildes")
 
 pylab.subplot(3, 2, 6)
-pylab.hist(pmes2, 50, histtype='stepfilled')
+pylab.hist(pmes2, 50, histtype='bar')
 pylab.xlabel('t (ms)')
-pylab.ylabel('n frames')
+pylab.ylabel('N frames')
 pylab.title("Histogramm der Zeitdauer der Grafikkarte zum Prozessieren des Bildes")
 
 pylab.subplot(3,2,3)

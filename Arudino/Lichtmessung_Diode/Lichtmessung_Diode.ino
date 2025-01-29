@@ -1,13 +1,12 @@
 double spannungmessen();
 void maximum(double a);
 
-double schwarz = 0.0; //max in mV
-bool state = true; //ist das Bild schwarz (false), oder weiß (true)
-int start = 0;
-int anzahlmessungen = 500;
-
 void setup() {
   Serial.begin(115200);
+  double schwarz = 0.0; //max in mV
+  bool state = true; //ist das Bild schwarz (false), oder weiß (true)
+  int start = 0;
+  int anzahlmessungen = 500;
 }
 
 void loop() {
@@ -20,7 +19,6 @@ void loop() {
     start = 1;
   }
   else if(start == 1){
-    long time = micros();
     double voltage = spannungmessen(); 
     if(voltage > schwarz+2 && state == true){
       state = false;
