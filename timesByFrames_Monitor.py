@@ -13,7 +13,7 @@ pmes2 = [] #Differenz von Programm zu Grafikkarte
 nIntervals = 500
 
 print("Start der Kalibrierung.")
-win = visual.Window(fullscr=True, waitBlanking=True, screen=1)
+win = visual.Window(fullscr=True, waitBlanking=True, screen=0)
 Vert = [[(-0.2,-0.2),(-0.2,0.2),(0.2,0.2),(0.2,-0.2)]] #Größe des Rechtecks, +/- 1 ist der höchste Wert
 myStim1 = ShapeStim(win, vertices=Vert, fillColor='black')
 myStim2 = ShapeStim(win, vertices=Vert, fillColor='white')
@@ -75,7 +75,7 @@ pylab.title("Zeitdifferenz von Grafikkarte zu Monitor")
 print(abw)
 
 pylab.subplot(3, 2, 2)
-pylab.hist(pmes1, 5, histtype='bar')
+pylab.hist(pmes1, 5, histtype='stepfilled')
 pylab.xlabel('t (ms)')
 pylab.ylabel('N frames')
 pylab.title("Histogramm der Zeitdifferenz von Grafikkarte zu Monitor")
@@ -87,7 +87,7 @@ pylab.xlabel('frame N')
 pylab.title("Zeitdauer der Grafikkarte zum Prozessieren des Bildes")
 
 pylab.subplot(3, 2, 6)
-pylab.hist(pmes2, 50, histtype='bar')
+pylab.hist(pmes2, 50, histtype='stepfilled')
 pylab.xlabel('t (ms)')
 pylab.ylabel('N frames')
 pylab.title("Histogramm der Zeitdauer der Grafikkarte zum Prozessieren des Bildes")

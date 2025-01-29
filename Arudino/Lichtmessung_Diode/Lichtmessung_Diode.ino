@@ -1,12 +1,13 @@
 double spannungmessen();
 void maximum(double a);
 
+double schwarz = 0.0; //max in mV
+bool state = true; //ist das Bild schwarz (false), oder weiß (true)
+int start = 0;
+int anzahlmessungen = 500;
+
 void setup() {
   Serial.begin(115200);
-  double schwarz = 0.0; //max in mV
-  bool state = true; //ist das Bild schwarz (false), oder weiß (true)
-  int start = 0;
-  int anzahlmessungen = 500;
 }
 
 void loop() {
@@ -14,7 +15,7 @@ void loop() {
     for(int i = 0; i < anzahlmessungen; i++){  
       maximum(spannungmessen()); //Bestimmen des maximalen Spannungswerts für Schwarz
     }
-    delay(1000);
+    delay(10000);
     Serial.println(1);
     start = 1;
   }
