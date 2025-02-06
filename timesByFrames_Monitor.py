@@ -70,7 +70,7 @@ pylab.subplot(3, 2, 1)
 pylab.plot(pmes1, '-')
 pylab.ylabel('t (ms)')
 pylab.xlabel('frame N')
-pylab.title("Zeitdifferenz von Grafikkarte zu Monitor")
+pylab.title("Zeitdauer zwischen PsychoPy und Monitor")
 
 print(abw)
 
@@ -78,26 +78,28 @@ pylab.subplot(3, 2, 2)
 pylab.hist(pmes1, 5, histtype='stepfilled')
 pylab.xlabel('t (ms)')
 pylab.ylabel('N frames')
-pylab.title("Histogramm der Zeitdifferenz von Grafikkarte zu Monitor")
+pylab.title("Histogramm der Zeitdauer zwischen PsychoPy und Monitor")
 
 pylab.subplot(3, 2, 5)
 pylab.plot(pmes2, '-')
 pylab.ylabel('t (ms)')
 pylab.xlabel('frame N')
-pylab.title("Zeitdauer der Grafikkarte zum Prozessieren des Bildes")
+pylab.title("Zeitdauer zwischen PsychoPy und Grafikkarte")
 
 pylab.subplot(3, 2, 6)
 pylab.hist(pmes2, 50, histtype='stepfilled')
 pylab.xlabel('t (ms)')
 pylab.ylabel('N frames')
-pylab.title("Histogramm der Zeitdauer der Grafikkarte zum Prozessieren des Bildes")
+pylab.title("Histogramm der Zeitdauer zwischen PsychoPy und Grafikkarte")
 
 pylab.subplot(3,2,3)
-if abw < 2.4:
-    pylab.text(0.7,0.5,"Die Messergbnisse sind valide!",fontsize=20,color='green')
-elif abw >= 2.4:
-    pylab.text(0.7,0.6,"Die Messergbnisse sind nicht valide!",fontsize=20,color='red',va='center')
-    pylab.text(0,0.4,"Kontrolle des Histogramms der Zeitdifferenz von Grafikkarte zu Monitor notwendig!",fontsize=20,color='red',va='center')
+if abw < 2:
+    pylab.text(0.7,0.5,"Die Messergbnisse sind gut!",fontsize=20,color='green')
+elif abw >= 2 and abw < 2.6:
+    pylab.text(0.7,0.5,"Die Messergebnisse sind akzeptabel!",fontsize=20,color='yellow')
+elif abw >= 2.6:
+    pylab.text(0.7,0.6,"Die Messergbnisse sind inakzeptabel!",fontsize=20,color='red',va='center')
+    pylab.text(0.7,0.4,"Kontrolle der Diagramme notwendig!",fontsize=20,color='red',va='center')
 pylab.axis('off')
 pylab.show()
     
