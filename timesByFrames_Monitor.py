@@ -49,7 +49,7 @@ for frameN in range(nIntervals):
     if bild != oldbild:
         t2=time.perf_counter_ns() #Die Grakikkarte hat den Bildwechsel verarbeitet
         x=0
-        while (port.inWaiting() == 0 and (time.perf_counter()-t2)<0.03):
+        while (port.inWaiting() == 0 and (time.perf_counter_ns()-t2)<(0.02*10^10):
             x = x + 1
         t3=time.perf_counter_ns() #Der Bildwechsel wurde vom Arduino detektiert
     while port.inWaiting() > 0:
