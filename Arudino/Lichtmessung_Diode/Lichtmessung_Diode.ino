@@ -36,7 +36,7 @@ double spannungmessen(){
   long sensorValue = 0;
   const int n = 10; 
   for ( int i = 0; i < n; i++){
-    sensorValue += analogRead(A0); //Spannungswerte werden gemittelt, da es sonst zu false positives kommt
+    sensorValue += analogRead(A0);          //Spannungswerte werden gemittelt, da es sonst zu false positives kommt
   }
   return (sensorValue/n) * (5000.0/1023.0); //sensorValue hat Werte von 0 bis 1023 und wird hier zu 0V bis 5000mV umgewandelt
 }

@@ -13,7 +13,7 @@ pmes2 = [] #Differenz von Programm zu Grafikkarte
 nIntervals = 500
 
 print("Start der Kalibrierung.")
-win = visual.Window(fullscr=True, waitBlanking=True, screen=0)
+win = visual.Window(fullscr=True, waitBlanking=True, screen=1)
 Vert = [[(-0.2,-0.2),(-0.2,0.2),(0.2,0.2),(0.2,-0.2)]] #Größe des Rechtecks, +/- 1 ist der höchste Wert
 myStim1 = ShapeStim(win, vertices=Vert, fillColor='black')
 myStim2 = ShapeStim(win, vertices=Vert, fillColor='white')
