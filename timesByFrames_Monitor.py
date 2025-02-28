@@ -32,6 +32,7 @@ while wait == 0:
 
 print("Start des Tests.")
 
+v = 10 #Verlangsamung der Bildwechsel
 oldbild=1
 for frameN in range(nIntervals):
     if (frameN//10) % 2 != 0:
@@ -49,55 +50,43 @@ for frameN in range(nIntervals):
     if bild != oldbild:
         t2=time.perf_counter_ns() #Die Grakikkarte hat den Bildwechsel verarbeitet
         x=0
-        while (port.inWaiting() == 0 and (time.perf_counter_ns()-t2)<(0.02*10^10):
+        while (port.inWaiting() == 0 and (time.perf_counter()-t2)<0.03):
             x = x + 1
         t3=time.perf_counter_ns() #Der Bildwechsel wurde vom Arduino detektiert
     while port.inWaiting() > 0:
         port.read() #Filler, damit die Schleife funktioniert
         hatread=1
     if bild != oldbild:
-        pmes1.append((t3-t2)/1000000)
-        pmes2.append((t2-t1)/1000000)
+        pmes1.append((t3-t1)/1000000)
         print(hatread) #wenn 0, dann wurde das Bild nicht erkannt
     oldbild = bild
 port.close()
 win.close()
 
-abw = pylab.std(pmes1)
 
 pylab.figure(figsize=[15, 11])
-pylab.subplot(3, 2, 1)
+pylab.subplot(2, 2, 1)
 pylab.plot(pmes1, '-')
 pylab.ylabel('t (ms)')
 pylab.xlabel('frame N')
 pylab.title("Zeitdauer zwischen PsychoPy und Monitor")
 
-print(abw)
-
-pylab.subplot(3, 2, 2)
+pylab.subplot(2, 2, 2)
 pylab.hist(pmes1, 5, histtype='stepfilled')
 pylab.xlabel('t (ms)')
 pylab.ylabel('N frames')
 pylab.title("Histogramm der Zeitdauer zwischen PsychoPy und Monitor")
 
-pylab.subplot(3, 2, 5)
-pylab.plot(pmes2, '-')
-pylab.ylabel('t (ms)')
-pylab.xlabel('frame N')
-pylab.title("Zeitdauer zwischen PsychoPy und Grafikkarte")
 
-pylab.subplot(3, 2, 6)
-pylab.hist(pmes2, 50, histtype='stepfilled')
-pylab.xlabel('t (ms)')
-pylab.ylabel('N frames')
-pylab.title("Histogramm der Zeitdauer zwischen PsychoPy und Grafikkarte")
+abw = pylab.std(pmes1)
+print(abw)
 
-pylab.subplot(3,2,3)
-if abw < 2:
+pylab.subplot(2,2,3)
+if abw < 3.5:
     pylab.text(0.7,0.5,"Die Messergbnisse sind gut!",fontsize=20,color='green')
-elif abw >= 2 and abw < 2.6:
+elif abw >= 3.5 and abw < 4:
     pylab.text(0.7,0.5,"Die Messergebnisse sind akzeptabel!",fontsize=20,color='yellow')
-elif abw >= 2.6:
+elif abw >= 4:
     pylab.text(0.7,0.6,"Die Messergbnisse sind inakzeptabel!",fontsize=20,color='red',va='center')
     pylab.text(0.7,0.4,"Kontrolle der Diagramme notwendig!",fontsize=20,color='red',va='center')
 pylab.axis('off')
